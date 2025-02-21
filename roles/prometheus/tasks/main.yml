@@ -1,0 +1,88 @@
+---
+- name: Unarchive node exporter
+  ansible.builtin.unarchive:
+    src: https://github.com/prometheus/node_exporter/releases/download/v1.7.0/node_exporter-1.7.0.linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: yes
+- name: Move node_exporter binary
+  shell: mv /tmp/node_exporter-1.7.0.linux-amd64 /etc/node_exporter
+- name: Copy node_exporter systemd file
+  ansible.builtin.copy:
+    src: files/node_exporter.service
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+    group: root
+    mode: '0644'
+- name: Restart service node_exporter also issue daemon-reload to pick up config changes
+  ansible.builtin.systemd_service:
+    state: restarted
+    daemon_reload: true
+    name: node_exporter
+    enabled: true
+- name: Add group prometheus
+  ansible.builtin.group:
+    name: prometheus
+    state: present
+- name: Add user prometheus
+  ansible.builtin.user:
+    name: prometheus
+    shell: /sbin/nologin
+    groups: prometheus
+- name: Create directories for prometheus
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - { path: '/etc/prometheus' }
+    - { path: '/var/lib/prometheus' }
+- name: Unarchive prometheus binaries
+  ansible.builtin.unarchive:
+    src: https://github.com/prometheus/prometheus/releases/download/v2.43.0/prometheus-2.43.0.linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: yes
+- name: Move prometheus binaries
+  shell: "mv /tmp/prometheus-2.43.0.linux-amd64/{{ item.binary }} {{ item.path }}"
+  loop:
+    - { binary: 'prometheus', path: '/usr/local/bin'}
+    - { binary: 'promtool', path: '/usr/local/bin' }
+    - { binary: 'consoles', path: '/etc/prometheus' }
+    - { binary: 'console_libraries', path: '/etc/prometheus' }
+- name: Copy prometheus config file
+  ansible.builtin.copy:
+    src: files/prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+    owner: prometheus
+    group: prometheus
+    mode: '0644'
+- name: Change prometheus files ownership, group
+  ansible.builtin.file:
+    path: "{{ item.path }}/{{ item.file }}"
+    owner: prometheus
+    group: prometheus
+  loop:
+    - { path: '/usr/local/bin', file: 'prometheus' }
+    - { path: '/usr/local/bin', file: 'promtool' }
+- name: Change prometheus folders ownership, group
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: prometheus
+    group: prometheus
+    recurse: yes
+  loop:
+    - { path: '/etc/prometheus/consoles' }
+    - { path: '/etc/prometheus/console_libraries' }
+    - { path: '/var/lib/prometheus' }
+- name: Copy prometheus systemd file
+  ansible.builtin.copy:
+    src: files/prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: '0644'
+- name: Restart service prometheus also issue daemon-reload to pick up config changes
+  ansible.builtin.systemd_service:
+    state: restarted
+    daemon_reload: true
+    name: prometheus
+    enabled: true
