@@ -1,0 +1,5 @@
+vagrant@vagrant:~$ sudo vim ~/.bashrc
+
+вставляем наши переменные 
+export VAULT_ADDR=https://127.0.0.1:8200
+export VAULT_SKIP_VERIFY=true
