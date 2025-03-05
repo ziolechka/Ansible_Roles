@@ -1,0 +1,6 @@
+vault_user: "vault"
+vault_group: "vault"
+vault_policy_path: "/etc/policy.hcl"
+nginx_domain: "vault.domain.local"
+basic_auth_user: "admin2"
+basic_auth_password: "admin2"

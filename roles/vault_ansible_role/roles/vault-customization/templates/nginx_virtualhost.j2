@@ -1,0 +1,16 @@
+server {
+    listen 80;
+    server_name {{ nginx_domain }};
+    access_log /var/log/nginx/{{ nginx_domain }}-access.log;
+    error_log /var/log/nginx/{{ nginx_domain }}-error.log;
+
+location / {
+    proxy_pass https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8200;
+    proxy_ssl_verify        off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Real-IP $remote_addr;
+    auth_basic "Restricted Content";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+}

@@ -1,0 +1,14 @@
+- name: Reading unseal key contents
+  command: cat {{item}}
+  register: unseal_keys
+  with_fileglob: "{{ unseal_keys_dir_output }}/*"
+  delegate_to: localhost
+  become: no
+
+- name: Unseal vault with unseal keys
+  shell: |
+    vault operator unseal {{ item.stdout }}
+  environment:
+    VAULT_ADDR: "https://127.0.0.1:8200"
+    VAULT_SKIP_VERIFY: "true"
+  with_items: "{{unseal_keys.results}}"

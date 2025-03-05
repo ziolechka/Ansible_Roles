@@ -1,4 +1,3 @@
-
 # Hashicorp Vault setup using Ansible Role
 
 We are going to create an Ansile Role for Vault setup so we can reuse it. We will begin by creating a new user account named "vault" which will help with a secure setup. We will use this account to isolate the ownership of vault. We don't create any home directory or shell for this user so that user can't log in to a server.
@@ -9,15 +8,10 @@ We need to set binary capabilities on Linux, to give the Vault executable the ab
 
 We need to setup systemd init file to manage the persistent vault daemon. We need to set below content into systemd service file. Finally, start the vault server.
 
-<<<<<<< HEAD
 ### Setup
-=======
-## Setup ##
->>>>>>> f8a05d1e7926e0b7978a75f293c66a8b61601c27
 
 Provide server IP address in the inventory file on which we want to run this playbook. 
 
-<<<<<<< HEAD
 Once done run command:
 ```
 ansible-playbook playbook.yml
@@ -27,11 +21,6 @@ For customization run command:
 ```
 ansible-playbook playbook.yml --tags 'nginx,policy,versioning,secrets'
 ```
-=======
-### Once done run command: ###
-
-> ansible-playbook playbook.yml
->>>>>>> f8a05d1e7926e0b7978a75f293c66a8b61601c27
 
 Manual generation basic auth credentials (add additional credentials)
 ```
